@@ -7,3 +7,7 @@ publish.workspace = true
 description = "Shared Asterism types. The core is no_std so contracts can use it."
 
 [dependencies]
+soroban-sdk = { workspace = true }
+
+[dev-dependencies]
+soroban-sdk = { workspace = true, features = ["testutils"] }

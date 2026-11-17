@@ -186,28 +186,9 @@ These points were stated from memory by the planning assistant and may be wrong 
 
 ---
 
-## 8. Repository setup tasks (Phase 0, part A)
+## 8. Repository setup (Phase 0, part A): DONE
 
-Perform in order. After each numbered step, run the relevant check and report the result. **Verify tool versions and command syntax against current docs rather than trusting the commands below verbatim.**
-
-1. **Prerequisites check.** Report installed versions of: `rustc`, `cargo`, the `wasm32` target for Soroban (confirm the exact target name in current docs), Stellar CLI, `node`, `pnpm`, `just`, `docker`, `gh`, `git`. List what is missing and ask before installing anything.
-2. **Create the repository directory** named `asterism` (confirm the final name with the maintainer first) and run `git init -b main`.
-3. **Root files:** `LICENSE` (MIT, with the maintainer's name and the current year), `README.md` (project summary, status badge placeholders, module table, "unaudited / testnet only" notice, quickstart placeholder), `CONTRIBUTING.md`, `CODE_OF_CONDUCT.md` (Contributor Covenant), `SECURITY.md`, `ROADMAP.md` (from section 11), `.gitignore`, `.editorconfig`.
-4. **Rust workspace:** root `Cargo.toml` with `[workspace]`, `resolver = "2"`, and shared `[workspace.package]` / `[workspace.dependencies]`. Add `rust-toolchain.toml`. Create `contracts/attestation-registry` (a Soroban contract; initialize with the Stellar CLI's current project-init command, or by hand if it differs) and `crates/asterism-types`.
-5. **TypeScript workspace:** root `package.json`, `pnpm-workspace.yaml`, `packages/config` (shared tsconfig and ESLint), and an empty `packages/sdk` skeleton.
-6. **`justfile`** with at least these recipes: `setup`, `build`, `test`, `lint`, `fmt`, `contracts-build`, `contracts-test`, `db-up`, `db-down`. Each recipe must work from the repo root.
-7. **CI (GitHub Actions):**
-   - `ci-rust.yml`: fmt check, clippy with `-D warnings`, `cargo test --workspace`, contract build. Cache cargo artifacts.
-   - `ci-ts.yml`: install with pnpm, lint, typecheck, test.
-   - Pin action versions; set minimal `permissions`.
-8. **Docker Compose** for local Postgres (`docker-compose.yml`) and a `.env.example`.
-9. **GitHub templates:** issue forms (bug, feature, good-first-issue) and the PR template (checklist: linked issue, tests, docs, `just lint` passes).
-10. **First commit** on a branch `chore/bootstrap`, open a PR to `main` (do not push directly to `main`), and confirm CI is green.
-11. **Report** a summary: files created, commands run, anything that deviated from this brief and why.
-
-Do **not** create the GitHub repository, push, or set branch protection until the maintainer confirms the repo name and owner (user or organisation).
-
----
+The bootstrap is complete: root files, Cargo workspace (`attestation-registry` stub, `asterism-types`), pnpm workspace (`packages/config`, `packages/sdk`), `justfile`, CI (`ci-rust.yml`, `ci-ts.yml`), issue/PR templates. Deviations from the original brief: no Docker (local native Postgres via `just db-up`/`db-down`); Stellar contract target is `wasm32v1-none`; `soroban-sdk = "25"`. Labels, milestones and issues (sections 9-10) are not created yet.
 
 ## 9. Labels and milestones
 

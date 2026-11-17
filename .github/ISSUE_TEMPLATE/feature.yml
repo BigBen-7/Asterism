@@ -1,0 +1,19 @@
+name: Feature request
+description: Propose a change (only current-milestone work is picked up)
+labels: ["type: feature"]
+body:
+  - type: textarea
+    id: context
+    attributes: { label: Context }
+    validations: { required: true }
+  - type: textarea
+    id: task
+    attributes: { label: Task }
+    validations: { required: true }
+  - type: textarea
+    id: acceptance
+    attributes: { label: Acceptance criteria, description: Observable, testable outcomes }
+    validations: { required: true }
+  - type: textarea
+    id: out
+    attributes: { label: Out of scope }

@@ -1,0 +1,22 @@
+name: Good first issue
+description: A task a newcomer can complete from the text alone
+labels: ["good first issue"]
+body:
+  - type: textarea
+    id: context
+    attributes: { label: Context }
+    validations: { required: true }
+  - type: textarea
+    id: task
+    attributes: { label: Task }
+    validations: { required: true }
+  - type: textarea
+    id: acceptance
+    attributes: { label: Acceptance criteria }
+    validations: { required: true }
+  - type: textarea
+    id: hints
+    attributes: { label: Notes / hints, description: Files and docs to start from }
+  - type: textarea
+    id: out
+    attributes: { label: Out of scope }

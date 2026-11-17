@@ -1,0 +1,9 @@
+[package]
+name = "asterism-types"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+publish.workspace = true
+description = "Shared Asterism types. The core is no_std so contracts can use it."
+
+[dependencies]

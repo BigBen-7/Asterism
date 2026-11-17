@@ -1,0 +1,17 @@
+# Rust
+target/
+**/test_snapshots/
+# Node
+node_modules/
+dist/
+.next/
+# Env and secrets
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

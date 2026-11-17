@@ -66,7 +66,7 @@ Attestation ids are also `u64` from a counter. Single vs. batch is decided as fo
 ### 4. Issuance and authorization
 
 - `issue` and `issue_batch` require the issuer's authorization (`require_auth`). The issuer is recorded in the attestation.
-- The registry does not decide *who may issue under a schema*. Any address may issue; consumers choose which issuers to trust. (Credential-specific issuer registration is a Phase 1 concern.)
+- The registry does not decide _who may issue under a schema_. Any address may issue; consumers choose which issuers to trust. (Credential-specific issuer registration is a Phase 1 concern.)
 - `issued_at` is the ledger timestamp at issuance. `expires_at`, if set, must be strictly in the future.
 
 ### 5. Revocation

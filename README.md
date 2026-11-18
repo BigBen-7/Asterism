@@ -34,6 +34,7 @@ just test
 
 - [Architecture](docs/architecture.md)
 - [Local development](docs/development.md)
+- [Credentials API](docs/api.md)
 - [Deploying to testnet](docs/deploy-testnet.md)
 - [Contract benchmarks](docs/benchmarks.md)
 - [Design RFCs](docs/rfcs/README.md)

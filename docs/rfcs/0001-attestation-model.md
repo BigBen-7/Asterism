@@ -59,7 +59,7 @@ Attestation {
 Attestation ids are also `u64` from a counter. Single vs. batch is decided as follows:
 
 - One record type with a `Commitment` enum, so there is a single storage layout, one `get`, one `revoke` and one event shape.
-- A **batch** is one registry entry whose commitment is a Merkle root. Subjects live in the leaves, so `subject` is `None`. A leaf is `SHA-256(0x00 || leaf_bytes)` and interior nodes are `SHA-256(0x01 || left || right)` (domain separation against second-preimage attacks). Leaf bytes are defined by the module that issues the batch.
+- A **batch** is one registry entry whose commitment is a Merkle root. Subjects live in the leaves, so `subject` is `None`. A leaf is `SHA-256(0x00 || leaf_bytes)` and interior nodes are `SHA-256(0x01 || left || right)` (domain separation against second-preimage attacks). Proofs carry no direction bits, so the two children of a node are ordered bytewise (smaller first) before hashing. Leaf bytes are defined by the module that issues the batch.
 - `verify_inclusion(attestation_id, leaf, proof)` checks a proof against the stored root and the attestation's status. Proof length is bounded (max 32 levels) so there is no unbounded loop.
 - The Merkle root is what makes issuing thousands of credentials one write.
 

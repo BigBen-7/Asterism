@@ -19,4 +19,4 @@ body:
     attributes: { label: Notes / hints, description: Files and docs to start from }
   - type: textarea
     id: out
-    attributes: { label: Out of scope }
+    attributes: { label: Out of scope, description: What this issue must NOT include }

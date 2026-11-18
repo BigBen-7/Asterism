@@ -1,6 +1,6 @@
 ## Summary
 
-<!-- What and why -->
+<!-- What and why. One issue per PR where possible. -->
 
 ## Checklist
 

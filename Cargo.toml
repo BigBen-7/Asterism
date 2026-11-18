@@ -1,6 +1,6 @@
 [workspace]
 resolver = "2"
-members = ["contracts/attestation-registry", "crates/asterism-types"]
+members = ["contracts/attestation-registry", "crates/asterism-types", "services/indexer"]
 
 [workspace.package]
 version = "0.0.0"

@@ -1,0 +1,15 @@
+{
+  "extends": "@asterism/config/tsconfig.base.json",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "react-jsx",
+    "noEmit": true,
+    "allowJs": true,
+    "isolatedModules": true,
+    "incremental": true,
+    "resolveJsonModule": true,
+    "plugins": [{ "name": "next" }]
+  },
+  "include": ["src", "next.config.mjs", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}

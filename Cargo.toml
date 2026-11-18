@@ -10,7 +10,7 @@ repository = "https://github.com/Chain-Explain/Asterism"
 publish = false
 
 [workspace.dependencies]
-soroban-sdk = "25"
+soroban-sdk = "29"
 asterism-types = { path = "crates/asterism-types" }
 
 [profile.release]

@@ -179,10 +179,10 @@ These points were stated from memory by the planning assistant and may be wrong 
 
 ### 7.6 Scope discipline (strict)
 
-- Only issues for the **current milestone** are open for work. Later-phase issues carry the `future` label and the milestone of their phase.
+- All issues are open for contributors to pick up and are grouped by the milestone of their phase. Check that the issues an item depends on are done before starting it.
 - A phase is "done" only when: its contracts are tested, deployed to testnet, documented, its SDK is released, and at least one person other than the maintainer has tried it and reported feedback.
-- Phases 3 and 4 involve funds and security. Do not start them until Phases 1-2 have been used by someone besides the maintainer.
-- If asked to add something outside the current phase, add it as a `future` issue instead of implementing it.
+- Phases 3 and 4 involve funds and security. Work on them needs extra review, and their READMEs must keep the unaudited notice.
+- If asked to add something clearly outside the project's scope, open an issue for discussion first instead of implementing it.
 
 ---
 
@@ -201,7 +201,7 @@ Create with `gh label create` / `gh api` after the remote repo exists.
 | Type | `type: feature`, `type: bug`, `type: docs`, `type: chore`, `type: design` (design spike / RFC), `type: security` |
 | Area | `area: registry`, `area: credentials`, `area: reputation`, `area: funding`, `area: governance`, `area: indexer`, `area: api`, `area: sdk`, `area: web`, `area: ci`, `area: docs` |
 | Phase | `phase: 0`, `phase: 1`, `phase: 2`, `phase: 3`, `phase: 4` |
-| Status | `future` (outside current milestone), `blocked`, `needs-verification` (relies on a claim in section 6 that has not been confirmed) |
+| Status | `blocked`, `needs-verification` (relies on a claim in section 6 that has not been confirmed) |
 | Community | `good first issue`, `help wanted` |
 | Size | `size: S` (under a day), `size: M` (1-3 days), `size: L` (3+ days; should usually be split) |
 
@@ -264,7 +264,7 @@ Apply: one `type:` label, one `area:` label, one `phase:` label, a size label, t
 | 0.16 | CI: add `cargo-deny` / dependency audit and Dependabot config | `type: chore`, `area: ci`, `good first issue`, `size: S` | |
 | 0.17 | Add issue/PR template polish and labels documentation to CONTRIBUTING | `type: docs`, `area: docs`, `good first issue`, `size: S` | |
 
-### 10.3 Phase 1: Credentials (`v0.1`): create with `future` label
+### 10.3 Phase 1: Credentials (`v0.1`)
 
 | # | Title | Area | Size |
 |---|---|---|---|
@@ -280,7 +280,7 @@ Apply: one `type:` label, one `area:` label, one `phase:` label, a size label, t
 | 1.10 | Docs: credentials quickstart and example integration | docs | S |
 | 1.11 | Release checklist and v0.1 tag (including external-tester feedback) | docs | S |
 
-### 10.4 Phase 2: Reputation (`v0.2`): `future`
+### 10.4 Phase 2: Reputation (`v0.2`)
 
 | # | Title | Area | Size |
 |---|---|---|---|
@@ -293,7 +293,7 @@ Apply: one `type:` label, one `area:` label, one `phase:` label, a size label, t
 | 2.7 | Web: contributor profile page | web | M |
 | 2.8 | Docs and v0.2 release | docs | S |
 
-### 10.5 Phase 3: Quadratic funding (`v0.3`): `future`
+### 10.5 Phase 3: Quadratic funding (`v0.3`)
 
 | # | Title | Area | Size |
 |---|---|---|---|
@@ -307,7 +307,7 @@ Apply: one `type:` label, one `area:` label, one `phase:` label, a size label, t
 | 3.8 | Security review checklist (self-review before any external audit) | funding | M |
 | 3.9 | Docs and v0.3 release (with unaudited notice) | docs | S |
 
-### 10.6 Phase 4: Governance (`v0.4`): `future`
+### 10.6 Phase 4: Governance (`v0.4`)
 
 | # | Title | Area | Size |
 |---|---|---|---|
@@ -324,7 +324,7 @@ Apply: one `type:` label, one `area:` label, one `phase:` label, a size label, t
 1. Write all issues as Markdown files under a temporary directory (not committed), one per issue.
 2. Show the maintainer the full title list for review, grouped by milestone.
 3. After approval, create them with `gh issue create --title ... --body-file ... --label ... --milestone ...`.
-4. Create Phase 0 issues first; add the `future` label to every issue in Phases 1-4.
+4. Create Phase 0 issues first, then Phases 1-4, each with its phase milestone.
 5. Report the list of created issue numbers and URLs.
 6. Optionally set up a GitHub Project board (Backlog / Ready / In progress / In review / Done) and add the issues. Ask first.
 
@@ -358,7 +358,7 @@ Estimates are rough guesses and depend on the maintainer's availability.
 
 - **Do not invent.** If a command, version, API or limit is not confirmed from current docs or from running it, say so and mark the item `needs-verification`.
 - **Ask before irreversible actions:** pushing, publishing, deploying contracts, creating the GitHub repository, installing system packages, deleting files.
-- **Stay in scope.** Implement only the current phase. Capture other ideas as `future` issues.
+- **Stay in scope.** Implement only the current phase. Capture other ideas as new issues.
 - **Keep changes small and tested.** One issue per PR, tests included, CI green.
 - **Report honestly.** If something failed or was skipped, say so plainly in the summary.
 - **Never** use mainnet keys or real funds. Testnet only.

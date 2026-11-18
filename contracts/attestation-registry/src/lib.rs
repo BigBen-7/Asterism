@@ -17,7 +17,9 @@
 //! write extends the instance TTL and the TTL of the entry it creates or
 //! changes to `DEFAULT_TTL_LEDGERS`.
 //!
-//! Events: `schema_registered`, `issued`, `batch_issued`, `revoked`.
+//! Events: `schema_registered`, `issued`, `batch_issued`, `revoked`. Issuance events carry
+//! `expires_at` and `schema_registered` carries `fields_hash`, so the API can verify
+//! credentials from the indexed events alone.
 //!
 //! # TTL policy (RFC 0002)
 //!
@@ -66,6 +68,7 @@ pub struct SchemaRegistered {
     #[topic]
     pub id: SchemaId,
     pub creator: Address,
+    pub fields_hash: BytesN<32>,
 }
 
 #[contractevent]
@@ -76,6 +79,7 @@ pub struct Issued {
     pub issuer: Address,
     pub subject: Address,
     pub commitment: BytesN<32>,
+    pub expires_at: Option<u64>,
 }
 
 #[contractevent]
@@ -85,6 +89,7 @@ pub struct BatchIssued {
     pub schema_id: SchemaId,
     pub issuer: Address,
     pub root: BytesN<32>,
+    pub expires_at: Option<u64>,
 }
 
 #[contractevent]
@@ -123,12 +128,17 @@ impl AttestationRegistry {
         let schema = Schema {
             name,
             version,
-            fields_hash,
+            fields_hash: fields_hash.clone(),
             revocable,
             creator: creator.clone(),
         };
         save_persistent(&env, &DataKey::Schema(id), &schema);
-        SchemaRegistered { id, creator }.publish(&env);
+        SchemaRegistered {
+            id,
+            creator,
+            fields_hash,
+        }
+        .publish(&env);
         Ok(id)
     }
 
@@ -167,6 +177,7 @@ impl AttestationRegistry {
             issuer,
             subject,
             commitment: data_hash,
+            expires_at,
         }
         .publish(&env);
         Ok(id)
@@ -200,6 +211,7 @@ impl AttestationRegistry {
             schema_id,
             issuer,
             root,
+            expires_at,
         }
         .publish(&env);
         Ok(id)

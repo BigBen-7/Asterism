@@ -33,6 +33,14 @@ contracts-build:
 contracts-test:
     cargo test --workspace
 
+# Print per-operation resource usage of the registry as a Markdown table (see docs/benchmarks.md)
+bench:
+    cargo test -p attestation-registry --test bench -- --ignored --nocapture
+
+# Build and deploy the registry to Stellar TESTNET (never mainnet); see docs/deploy-testnet.md
+deploy-testnet:
+    scripts/deploy-testnet.sh
+
 # Create the local dev database on the native Postgres (starts nothing; Postgres must be running)
 db-up:
     pg_isready -q

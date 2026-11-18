@@ -69,6 +69,13 @@ Records past logical expiry are not actively deleted. Keepers need not extend th
 
 The indexer persists every event from the first deployment (RPC event retention is limited; see issue 0.12). This means an archived record's history is still available off-chain even if the on-chain entry has to be restored.
 
+## Implementation (issue 0.8)
+
+- `extend_ttl(kind, id)` (`kind` is `Schema` or `Attestation`) and `extend_instance_ttl()` are public and need no authorization.
+- Both use `extend_ttl(TTL_THRESHOLD, DEFAULT_TTL_LEDGERS)`: nothing happens while more than `TTL_THRESHOLD` ledgers remain, and otherwise the TTL is set to exactly `DEFAULT_TTL_LEDGERS`. A TTL is never shortened and never exceeds that bound.
+- A missing record (never created, or archived) returns `SchemaNotFound` / `AttestationNotFound`. An archived record must be restored first.
+- The constants are still the placeholders from Decision 3. Confirmed items 1 to 3 above remain open and `needs-verification`; the contract does not depend on them beyond `DEFAULT_TTL_LEDGERS` being at or below the network maximum.
+
 ## Alternatives considered
 
 - **Contract pays all rent from a fee pool.** Rejected for Phase 0: adds fund-handling logic and an economic design the project does not need yet.

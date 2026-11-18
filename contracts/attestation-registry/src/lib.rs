@@ -18,6 +18,15 @@
 //! changes to `DEFAULT_TTL_LEDGERS`.
 //!
 //! Events: `schema_registered`, `issued`, `batch_issued`, `revoked`.
+//!
+//! # TTL policy (RFC 0002)
+//!
+//! Records are paid for by whoever creates them (see above). Reads never
+//! extend a TTL. `extend_ttl` and `extend_instance_ttl` are public and need no
+//! authorization: anyone may pay to keep a record alive. Both extend only
+//! when the remaining TTL is below `TTL_THRESHOLD`, and always to exactly
+//! `DEFAULT_TTL_LEDGERS`, so a TTL is never shortened and never pushed past
+//! that bound.
 
 mod merkle;
 
@@ -34,6 +43,14 @@ use soroban_sdk::{
 const TTL_THRESHOLD: u32 = 518_400;
 /// Extend an entry to this many ledgers (about 180 days). Placeholder per RFC 0002.
 const DEFAULT_TTL_LEDGERS: u32 = 3_110_400;
+
+/// Which kind of record `extend_ttl` should keep alive.
+#[contracttype]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum RecordKind {
+    Schema,
+    Attestation,
+}
 
 #[contracttype]
 #[derive(Clone)]
@@ -222,6 +239,34 @@ impl AttestationRegistry {
         save_persistent(&env, &DataKey::Attestation(id), &attestation);
         Revoked { id, issuer: caller }.publish(&env);
         Ok(())
+    }
+
+    /// Keeps a schema or attestation alive by extending its TTL to
+    /// `DEFAULT_TTL_LEDGERS` if less than `TTL_THRESHOLD` ledgers remain.
+    /// Permissionless; fails with the matching not-found error if the record
+    /// does not exist (for example, it has been archived and must be restored first).
+    pub fn extend_ttl(env: Env, kind: RecordKind, id: u64) -> Result<(), Error> {
+        let key = match kind {
+            RecordKind::Schema => DataKey::Schema(id),
+            RecordKind::Attestation => DataKey::Attestation(id),
+        };
+        let storage = env.storage().persistent();
+        if !storage.has(&key) {
+            return Err(match kind {
+                RecordKind::Schema => Error::SchemaNotFound,
+                RecordKind::Attestation => Error::AttestationNotFound,
+            });
+        }
+        storage.extend_ttl(&key, TTL_THRESHOLD, DEFAULT_TTL_LEDGERS);
+        Ok(())
+    }
+
+    /// Extends the shared TTL of instance storage (counters and the contract
+    /// instance) under the same threshold and bound as `extend_ttl`. Permissionless.
+    pub fn extend_instance_ttl(env: Env) {
+        env.storage()
+            .instance()
+            .extend_ttl(TTL_THRESHOLD, DEFAULT_TTL_LEDGERS);
     }
 
     /// Checks that `leaf` is a member of batch attestation `id` using `proof`

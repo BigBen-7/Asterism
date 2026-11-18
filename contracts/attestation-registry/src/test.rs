@@ -540,3 +540,131 @@ fn batch_revocation_counts_as_whole_batch() {
         Err(Ok(Error::NotRevocable))
     );
 }
+
+// TTL extension (RFC 0002)
+
+fn persistent_ttl(s: &Setup, key: &DataKey) -> u32 {
+    s.env.as_contract(&s.client.address, || {
+        s.env.storage().persistent().get_ttl(key)
+    })
+}
+
+fn instance_ttl(s: &Setup) -> u32 {
+    s.env
+        .as_contract(&s.client.address, || s.env.storage().instance().get_ttl())
+}
+
+fn advance_ledgers(s: &Setup, by: u32) {
+    s.env.ledger().with_mut(|l| {
+        l.sequence_number += by;
+        l.max_entry_ttl = l.max_entry_ttl.max(DEFAULT_TTL_LEDGERS);
+    });
+}
+
+#[test]
+fn records_get_the_default_ttl_on_creation() {
+    let s = setup();
+    let schema = register(&s, true);
+    let att = s
+        .client
+        .issue(&s.issuer, &schema, &s.subject, &hash(&s.env, 2), &None);
+    assert_eq!(
+        persistent_ttl(&s, &DataKey::Schema(schema)),
+        DEFAULT_TTL_LEDGERS
+    );
+    assert_eq!(
+        persistent_ttl(&s, &DataKey::Attestation(att)),
+        DEFAULT_TTL_LEDGERS
+    );
+    assert_eq!(instance_ttl(&s), DEFAULT_TTL_LEDGERS);
+}
+
+#[test]
+fn extend_ttl_is_a_no_op_above_the_threshold() {
+    let s = setup();
+    let schema = register(&s, true);
+    advance_ledgers(&s, 1_000);
+    s.client.extend_ttl(&RecordKind::Schema, &schema);
+    assert_eq!(
+        persistent_ttl(&s, &DataKey::Schema(schema)),
+        DEFAULT_TTL_LEDGERS - 1_000
+    );
+}
+
+#[test]
+fn extend_ttl_restores_the_default_below_the_threshold() {
+    let s = setup();
+    let schema = register(&s, true);
+    let att = s
+        .client
+        .issue(&s.issuer, &schema, &s.subject, &hash(&s.env, 2), &None);
+    advance_ledgers(&s, DEFAULT_TTL_LEDGERS - TTL_THRESHOLD + 1);
+    assert!(persistent_ttl(&s, &DataKey::Schema(schema)) < TTL_THRESHOLD);
+
+    s.client.extend_ttl(&RecordKind::Schema, &schema);
+    s.client.extend_ttl(&RecordKind::Attestation, &att);
+    assert_eq!(
+        persistent_ttl(&s, &DataKey::Schema(schema)),
+        DEFAULT_TTL_LEDGERS
+    );
+    assert_eq!(
+        persistent_ttl(&s, &DataKey::Attestation(att)),
+        DEFAULT_TTL_LEDGERS
+    );
+}
+
+#[test]
+fn extend_ttl_is_bounded_by_the_default() {
+    let s = setup();
+    let schema = register(&s, true);
+    advance_ledgers(&s, DEFAULT_TTL_LEDGERS - TTL_THRESHOLD + 1);
+    for _ in 0..3 {
+        s.client.extend_ttl(&RecordKind::Schema, &schema);
+        assert_eq!(
+            persistent_ttl(&s, &DataKey::Schema(schema)),
+            DEFAULT_TTL_LEDGERS
+        );
+    }
+}
+
+#[test]
+fn extend_ttl_needs_no_authorization() {
+    let env = Env::default();
+    env.mock_all_auths();
+    let id = env.register(AttestationRegistry, ());
+    let client = AttestationRegistryClient::new(&env, &id);
+    let creator = Address::generate(&env);
+    let schema = client.register_schema(
+        &creator,
+        &String::from_str(&env, "degree"),
+        &1,
+        &hash(&env, 1),
+        &true,
+    );
+    env.set_auths(&[]);
+    client.extend_ttl(&RecordKind::Schema, &schema);
+    client.extend_instance_ttl();
+}
+
+#[test]
+fn extend_ttl_unknown_record_is_an_error() {
+    let s = setup();
+    assert_eq!(
+        s.client.try_extend_ttl(&RecordKind::Schema, &1),
+        Err(Ok(Error::SchemaNotFound))
+    );
+    assert_eq!(
+        s.client.try_extend_ttl(&RecordKind::Attestation, &1),
+        Err(Ok(Error::AttestationNotFound))
+    );
+}
+
+#[test]
+fn extend_instance_ttl_restores_the_default_below_the_threshold() {
+    let s = setup();
+    register(&s, true);
+    advance_ledgers(&s, DEFAULT_TTL_LEDGERS - TTL_THRESHOLD + 1);
+    assert!(instance_ttl(&s) < TTL_THRESHOLD);
+    s.client.extend_instance_ttl();
+    assert_eq!(instance_ttl(&s), DEFAULT_TTL_LEDGERS);
+}

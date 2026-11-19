@@ -1,0 +1,36 @@
+name: sandbox-guard
+
+# Runs from the base branch (pull_request_target), so a PR cannot weaken it.
+# It never checks out or executes PR code: it only reads the list of changed
+# file names through the API.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  guard:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          set -euo pipefail
+          files=$(gh api --paginate "repos/$REPO/pulls/$PR/files?per_page=100" --jq '.[].filename')
+          [ -z "$files" ] && exit 0
+          if ! echo "$files" | grep -q '^sandbox/'; then
+            exit 0   # not a sandbox PR
+          fi
+          allowed='^sandbox/lab/(src/tasks/[0-9]{3}-[a-z0-9-]+\.ts|test/[0-9]{3}-[a-z0-9-]+\.test\.ts)$'
+          bad=$(echo "$files" | grep -Ev "$allowed" || true)
+          if [ -n "$bad" ]; then
+            echo "::error::Sandbox PRs may only change task and test files (sandbox/lab/src/tasks/NNN-*.ts and sandbox/lab/test/NNN-*.test.ts). Disallowed:"
+            echo "$bad"
+            exit 1
+          fi

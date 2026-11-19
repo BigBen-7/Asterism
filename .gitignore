@@ -15,3 +15,7 @@ dist/
 .DS_Store
 .idea/
 .vscode/
+
+# Maintainer reports contain contributor handles; never commit
+infra/reports/*
+!infra/reports/.gitkeep

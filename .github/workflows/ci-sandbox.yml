@@ -1,0 +1,28 @@
+name: ci-sandbox
+
+on:
+  pull_request:
+    paths:
+      - "sandbox/**"
+      - ".github/workflows/ci-sandbox.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  sandbox:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: sandbox/lab
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: sandbox/lab/package.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
